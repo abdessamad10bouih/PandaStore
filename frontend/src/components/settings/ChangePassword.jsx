@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader } from "../ui/card"

@@ -22,7 +22,7 @@ const produitSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Categorie'
     }],
-    sousCategories: [{
+    subCategories: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Categorie'
     }],

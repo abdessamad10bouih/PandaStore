@@ -5,7 +5,7 @@ import upload from '../lib/multerConfig.js';
 
 const route = express.Router()
 
-route.post('/ajouter', upload.fields([{ name: "images", maxCount: 4 }]), AjouterProduit)
+route.post('/ajouter', upload.array('images'), AjouterProduit)
 route.put('/modifier/:productId', upload.array('images'), ModifierProduit)
 route.delete('/supprimer', SupprimerProduit)
 route.get('/', getAllProduits)

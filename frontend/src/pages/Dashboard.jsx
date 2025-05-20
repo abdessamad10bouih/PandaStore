@@ -7,7 +7,7 @@ import LineCharts from "../components/LineCharts"
 import CircleChart from "../components/CircleChart"
 import ProductsTable from "../components/TableProducts"
 import { useProducts } from "../context/ProductContext"
-import { Forward, Package, ShoppingBag, ShoppingBasket, User } from "lucide-react"
+import { Forward, LucideBadgeDollarSign, Package, ShoppingBag, ShoppingBasket, User } from "lucide-react"
 import { Link } from "react-router-dom"
 import Layout from "../Layout/Layout"
 import DashboardCard from "../components/DashboardCard"
@@ -34,14 +34,14 @@ const Dashboard = () => {
 
         fetchUser();
     }, []);
-
+    const activeProducts = products.filter((product) => product.status === "active")
     return (
         <Layout>
             <div className="flex-1 overflow-auto p-6">
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    <DashboardCard title="Revenu Total" value="$24,780" change="+12.5%" trend="up" />
+                    <DashboardCard title="Revenu Total" value="$24,780" icon={<LucideBadgeDollarSign />} change="+12.5%" trend="up" color="green" percentageChange={8.1} />
                     <DashboardCard title="Nouvelles Commandes" value="342" icon={<Package />} color="green" percentageChange={8.1} />
-                    <DashboardCard title="Produits Actifs" data={products} value={products.length} icon={<ShoppingBasket />} color="red" percentageChange={-2.3} />
+                    <DashboardCard title="Produits Actifs" data={products} value={activeProducts.length} icon={<ShoppingBasket />} color="red" percentageChange={-2.3} />
                     <DashboardCard title="Total Clients" value={users?.length} icon={<User />} color="blue" percentageChange={-50.3} />
                 </div>
                 <div className="mt-8">

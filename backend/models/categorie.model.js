@@ -14,6 +14,7 @@ const categorieSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Categorie',
     }],
+    image: { type: String, default: null },
 }, { timestamps: true });
 
 

@@ -149,7 +149,7 @@ export default function FournisseurModal({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>
+            <DialogTrigger asChild>
                 {isEditMode ?
                     <Button className="p-2 gap-4 w-full" variant="ghost">
                         <Edit className="text-gray-500" />

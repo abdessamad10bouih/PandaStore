@@ -110,7 +110,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['active', 'suspended', 'banned'],
         default: 'active'
-    }
+    },
+    otp: { type: String },
+    otpExpires: { type: Date },
 }, { timestamps: true });
 
 userSchema.index({ email: 1 });

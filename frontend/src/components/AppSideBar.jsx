@@ -90,18 +90,18 @@ const AppSideBar = ({ Active, onExpandChange }) => {
                             <TooltipProvider key={index} delayDuration={0}>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Link to={`/${item.name.toLowerCase()}`}>
+                                        <Link to={item.name.toLowerCase() === "dashboard" ? "/dashboard" : `/dashboard/${item.name.toLowerCase()}`}>
                                             <Button
                                                 variant="ghost"
                                                 className={`relative w-full justify-start gap-3 px-3 py-6 h-12 font-normal transition-all
-                                                    ${Active === item.name
+                                                    ${window.location.pathname === `/dashboard${item.name.toLowerCase() === "dashboard" ? "" : `/${item.name.toLowerCase()}`}`
                                                         ? "bg-primary/10 text-primary font-medium before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-8 before:w-1 before:bg-primary before:rounded-r-full"
                                                         : ""} 
                                                     ${!expanded ? "px-0 justify-center" : ""} 
                                                     group`}
                                             >
                                                 <item.icon
-                                                    className={`h-5 w-5 shrink-0 ${Active === item.name ? "text-primary" : ""}`}
+                                                    className={`h-5 w-5 shrink-0 ${window.location.pathname === `/dashboard${item.name.toLowerCase() === "dashboard" ? "" : `/${item.name.toLowerCase()}`}` ? "text-primary" : ""}`}
                                                 />
                                                 <span className={`transition-opacity ${!expanded ? "sr-only opacity-0" : ""}`}>
                                                     {item.name}
@@ -138,11 +138,11 @@ const AppSideBar = ({ Active, onExpandChange }) => {
                                 <TooltipProvider key={index} delayDuration={0}>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <Link to={`/${item.name.toLowerCase()}`}>
+                                            <Link to={`/dashboard/${item.name.toLowerCase()}`}>
                                                 <Button
                                                     variant="ghost"
                                                     className={`relative w-full justify-start gap-3 px-3 py-6 h-12 font-normal transition-all
-                                                        ${Active === item.name
+                                                        ${window.location.pathname === `/dashboard/${item.name.toLowerCase()}`
                                                             ? "bg-primary/10 text-primary font-medium before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-8 before:w-1 before:bg-primary before:rounded-r-full"
                                                             : ""} 
                                                         ${!expanded ? "px-0 justify-center" : ""} 

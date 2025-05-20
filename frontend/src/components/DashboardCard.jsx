@@ -1,113 +1,65 @@
-import { DollarSign, TrendingUp, TrendingDown } from "lucide-react";
-import { Card, CardContent } from "../components/ui/card";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area } from "recharts";
-import { useProducts } from "../context/ProductContext";
+import { cva } from "class-variance-authority"
+import { ArrowDownRight, ArrowUpRight } from "lucide-react"
 
-export default function DashboardCard({
-  title = "Total Sales",
-  value = "$716,519",
-  percentageChange = 20,
-  data = [],
-  icon = <DollarSign className="h-5 w-5" />,
-  color = "#ff6b4a",
-  isLoading = false,
-}) {
-  const formattedPercentage = percentageChange >= 0 ? `+${percentageChange}%` : `${percentageChange}%`;
+import { cn } from "../lib/utils"
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 
-  const percentageColor = percentageChange >= 0 ? "text-green-500" : "text-red-500";
-  const percentageIcon =
-    percentageChange >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />;
+const colorVariants = cva("", {
+  variants: {
+    color: {
+      blue: "bg-blue-50 text-blue-700 border-blue-100",
+      green: "bg-green-50 text-green-700 border-green-100",
+      red: "bg-red-50 text-red-700 border-red-100",
+      yellow: "bg-yellow-50 text-yellow-700 border-yellow-100",
+      purple: "bg-purple-50 text-purple-700 border-purple-100",
+      gray: "bg-gray-50 text-gray-700 border-gray-100",
+    },
+  },
+  defaultVariants: {
+    color: "gray",
+  },
+})
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-2 border rounded shadow-sm text-xs">
-          <p className="font-medium">{label}</p>
-          <p className="text-gray-700">
-            {new Intl.NumberFormat("ar-MA", {
-              style: "currency",
-              currency: "MAD",
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 0,
-            }).format(payload[0].value)}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+const iconColorVariants = cva("p-2 rounded-md", {
+  variants: {
+    color: {
+      blue: "bg-blue-100 text-blue-700",
+      green: "bg-green-100 text-green-700",
+      red: "bg-red-100 text-red-700",
+      yellow: "bg-yellow-100 text-yellow-700",
+      purple: "bg-purple-100 text-purple-700",
+      gray: "bg-gray-100 text-gray-700",
+    },
+  },
+  defaultVariants: {
+    color: "gray",
+  },
+})
 
-  const { products } = useProducts()
+export default function DashboardCard({ title, value, icon, color = "gray", percentageChange, className }) {
+  const isPositiveChange = percentageChange !== undefined && percentageChange >= 0
+  const formattedPercentage = percentageChange !== undefined ? Math.abs(percentageChange).toFixed(1) : null
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-6">
-        {isLoading ? (
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded mb-4"></div>
-            <div className="h-10 bg-gray-200 rounded mb-6"></div>
-            <div className="h-[180px] bg-gray-200 rounded"></div>
-          </div>
-        ) : (
-          <>
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-8 h-8 rounded-md bg-orange-100 text-orange-500">
-                  {icon}
-                </div>
-                <span className="text-sm font-medium text-gray-500">{title}</span>
-              </div>
-              <div className={`flex items-center gap-1 text-xs font-medium ${percentageColor}`}>
-                {percentageIcon}
-                {formattedPercentage}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-              <span className="text-2xl font-bold">{value}</span>
-            </div>
-
-            <div className="h-[180px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                  <defs>
-                    <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={color} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={color} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: "#888" }}
-                    dy={10}
-                  />
-                  <YAxis hide={true} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke={color}
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorGradient)"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke={color}
-                    strokeWidth={2}
-                    dot={false}
-                    activeDot={{ r: 6, fill: color, stroke: "white", strokeWidth: 2 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </>
+    <Card className={cn("overflow-hidden", className)}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <div className={cn(iconColorVariants({ color }))}>{icon}</div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        {percentageChange !== undefined && (
+          <p className="mt-2 flex items-center text-xs">
+            {isPositiveChange ? (
+              <ArrowUpRight className="mr-1 h-4 w-4 text-green-600" />
+            ) : (
+              <ArrowDownRight className="mr-1 h-4 w-4 text-red-600" />
+            )}
+            <span className={isPositiveChange ? "text-green-600" : "text-red-600"}>{formattedPercentage}%</span>
+            <span className="ml-1 text-muted-foreground">par rapport au mois dernier</span>
+          </p>
         )}
       </CardContent>
     </Card>
-  );
+  )
 }

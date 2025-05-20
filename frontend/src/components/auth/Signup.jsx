@@ -5,10 +5,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeClosed, Facebook, Loader2 } from 'lucide-react'
 import { register } from '../../lib/api'
 import CustomToast from '../CustomToast'
+import { Checkbox } from '../ui/checkbox'
 
 const Signup = () => {
     const [toggle, setToggle] = useState(true)
     const [toggle2, setToggle2] = useState(true)
+    const [termAgreed, setTermsagreed] = useState(false)
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
@@ -47,7 +49,9 @@ const Signup = () => {
     }
     return (
         <div className='w-full flex h-screen'>
-            <div className='w-1/2 h-full bg-muted'></div>
+            <div className='w-1/2 h-full bg-muted'>
+                <img src="/signup.jpg" className='w-full h-full object-cover' alt="signup" />
+            </div>
             <div className='w-1/2 h-full flex items-center justify-center'>
                 <Card className="w-[50%]">
                     <CardHeader>
@@ -110,7 +114,17 @@ const Signup = () => {
                                     {toggle2 ? <Eye onClick={() => setToggle2(!toggle2)} /> : <EyeClosed onClick={() => setToggle2(!toggle2)} />}
                                 </div>
                             </div>
-                            <button type='submit' className='bg-primary text-white py-2 px-4 rounded' disabled={loading}>
+                            <div className='flex items-center px-2 gap-2'>
+                                <Checkbox
+                                    id="terms"
+                                    checked={termAgreed}
+                                    onCheckedChange={(checked) => setTermsagreed(checked)}
+                                />
+                                <label htmlFor="terms" className="text-sm">
+                                    J'accepte les <Link to="/terms" className="text-blue-600 hover:underline">termes et conditions</Link>
+                                </label>
+                            </div>
+                            <button type='submit' className='bg-primary text-white py-2 px-4 rounded disabled:opacity-50' disabled={!termAgreed || loading}>
                                 {loading ? <><Loader2 className="inline-block mr-2 animate-spin" />Inscription en cours ...</> : 'S\'inscrire'}
                             </button>
                             <div className='w-full border my-2 flex items-center justify-center h-[1px] bg-muted-foreground'>

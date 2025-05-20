@@ -51,7 +51,16 @@ export const supprimerProduit = async (productId) => { return await apiInstance.
 
 // 🔹 Categories Api
 export const getCategories = async () => { return await apiInstance.get('/categories/all'); }
-export const ajouterCategorie = async (data) => { return await apiInstance.post('/categories/ajouter', data) }
+export const modifierCategorie = async (categorieId, data) => {
+    return await apiInstance.post(`/categories/modifier/${categorieId}`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+}
+export const ajouterCategorie = async (data) => {
+    return await apiInstance.post('/categories/ajouter', data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+    });
+}
 
 
 
@@ -67,6 +76,21 @@ export const supprimerFournisseur = async (fournisseurId) => { return await apiI
 export const changePassword = async (data) => { return await apiInstance.put('/user/changePassword', data) }
 export const modifierUser = async (data) => { return await apiInstance.put('/user/modifier', data) }
 export const getAllUsers = async () => { return apiInstance.get('/user/users') }
+export const forgotPassword = async (data) => {
+    return await apiInstance.post('/user/forgotPassword', data, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+}
+export const verifierOTP = async (data) => {
+    return await apiInstance.post('/user/verifierOTP', data, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+}
+export const resetPassword = async (data) => {
+    return await apiInstance.post('/user/reset-password', data, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+}
 
 
 
@@ -78,3 +102,14 @@ export const ajouterPost = async (data) => {
         headers: { 'Content-Type': 'multipart/form-data' }
     });
 }
+export const modifierPost = async (postId, data) => {
+    try {
+        return await apiInstance.put(`/posts/modifier/${postId}`, data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+    } catch (error) {
+        console.error('Error modifying post:', error.response ? error.response.data : error);
+        throw error;
+    }
+}
+export const supprimerPost = async (postId) => { return await apiInstance.delete(`/posts/supprimer/${postId}`) }

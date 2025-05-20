@@ -13,14 +13,14 @@ import {
 import { Button } from "../ui/button"
 import { toast } from "sonner"
 
-export function DeleteModal({ supprimerFun, text, use = "min" }) {
+export function DeleteModal({ supprimerFun, text, use = "min", className }) {
 
 
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                {use === "max" ? <Button variant="primary" className="bg-destructive w-full text-white hover:bg-destructive/80">
-                    <Trash />
+                {use === "max" ? <Button variant="primary" className={`bg-destructive w-full text-white hover:bg-destructive/80 ${className} cursor-pointer`}>
+                    <Trash className="text-white" />
                     {text ? text : "Supprimer"}
                 </Button> : <Trash className="text-red-500 cursor-pointer" size={19} />}
 

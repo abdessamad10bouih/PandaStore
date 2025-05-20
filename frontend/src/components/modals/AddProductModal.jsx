@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import {
@@ -73,7 +73,7 @@ export default function ProductModal({ product, mode = "add", use = "max" }) {
         prix: product.prix || 0,
         images: product.images || [],
         categories: product.categories?.map((cat) => cat._id) || [],
-        subcategories: product.subcategories || [],
+        subcategories: product.subCategories?.map((s) => s._id) || [],
         stock: product.stock || 0,
         specifications: product.specifications || [],
         status: product.status || "active",
@@ -106,7 +106,7 @@ export default function ProductModal({ product, mode = "add", use = "max" }) {
       setImageFiles([]);
     }
   }, [product, open, isEditMode]);
-
+  console.log("product", product, "formData", formData)
   useEffect(() => {
     previewUrls.forEach((url) => URL.revokeObjectURL(url))
     const newPreviewUrls = imageFiles.map((file) => URL.createObjectURL(file))
@@ -248,6 +248,7 @@ export default function ProductModal({ product, mode = "add", use = "max" }) {
   const calculatedProfit = formData.prix - formData.cost
   const profitMargin = formData.cost > 0 ? (((formData.prix - formData.cost) / formData.prix) * 100).toFixed(2) : 0
 
+  // console.log("formData: ", formData)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -284,7 +285,7 @@ export default function ProductModal({ product, mode = "add", use = "max" }) {
       const formDataToSubmit = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "specifications") {
-          formDataToSubmit.append(key, JSON.stringify(value)); // ✅ stringify object array
+          formDataToSubmit.append(key, JSON.stringify(value));
         } else if (Array.isArray(value)) {
           value.forEach((item) => formDataToSubmit.append(`${key}[]`, item));
         } else {
@@ -302,131 +303,32 @@ export default function ProductModal({ product, mode = "add", use = "max" }) {
         });
       }
 
-      console.log("formdata avant l'envoi: ", formDataToSubmit);
+      // console.log("formdata avant l'envoi: ", formDataToSubmit);
       const res = isEditMode
         ? await modifierProduit(product._id, formDataToSubmit)
         : await addProduit(formDataToSubmit);
 
-      CustomToast('success', `Produit ${isEditMode ? 'modifié' : 'ajouté'} avec succès`);
+      const produit = res.produit;
+      CustomToast('success', res.message || `Produit ${isEditMode ? 'modifié' : 'ajouté'} avec succès`);
+      // if (produit) {
+
+      // }
       setProducts((prev) => {
-        if (isEditMode) {
-          return prev.map((p) => (p._id === product._id ? { ...p, ...res.data.produit } : p));
+        if (isEditMode && produit) {
+          return prev.map((p) => (p._id === product._id ? { ...p, ...res.produit } : p));
         }
-        return [...prev, res.data.produit];  // Ensure you're using the full product object here
+        return [...prev, res.produit];
       });
       setOpen(false);
       setIsSubmitting(false);
     } catch (error) {
       console.error("Erreur:", error);
       CustomToast('error', error.response?.data?.message || "Erreur lors de l'ajout ou la modification du produit");
+    } finally {
+      setIsSubmitting(false);
+
     }
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setIsSubmitting(true);
-
-  //   try {
-  //     // Validation
-  //     const validateForm = () => {
-  //       const errors = [];
-  //       if (!formData.nom) errors.push("Le nom du produit est requis");
-  //       if (!formData.description) errors.push("La description est requise");
-  //       if (formData.prix === undefined || formData.prix === null || isNaN(formData.prix)) {
-  //         errors.push("Le prix doit être un nombre valide");
-  //       } else if (formData.prix <= 0) {
-  //         errors.push("Le prix doit être supérieur à 0");
-  //       }
-  //       if (formData.stock < 0) errors.push("Le stock ne peut pas être négatif");
-  //       if (formData.cost < 0) errors.push("Le coût ne peut pas être négatif");
-  //       if (formData.discount < 0 || formData.discount > 100) {
-  //         errors.push("La remise doit être entre 0 et 100");
-  //       }
-  //       if (formData.categories.length === 0) {
-  //         errors.push("Veuillez sélectionner au moins une catégorie");
-  //       }
-  //       if (formData.specifications.some(spec => !spec.nom || !spec.valeur)) {
-  //         errors.push("Toutes les spécifications doivent avoir un nom et une valeur");
-  //       }
-  //       if (errors.length > 0) {
-  //         throw new Error(errors.join("\n"));
-  //       }
-  //     };
-  //     validateForm();
-
-  //     const formDataToSubmit = new FormData();
-
-  //     // Essential fields
-  //     const fields = {
-  //       nom: formData.nom,
-  //       description: formData.description,
-  //       prix: isNaN(formData.prix) || formData.prix === null ? "0" : String(formData.prix),
-  //       stock: String(formData.stock),
-  //       sku: formData.sku,
-  //       profit: String(calculatedProfit),
-  //       discount: String(formData.discount),
-  //       vente: String(formData.vente),
-  //       cost: String(formData.cost),
-  //       status: formData.status,
-  //     };
-  //     Object.entries(fields).forEach(([key, value]) => {
-  //       if (value !== undefined && value !== null) {
-  //         formDataToSubmit.append(key, value);
-  //       }
-  //     });
-
-  //     // Categories and subcategories
-  //     formData.categories.forEach(id => formDataToSubmit.append("categories[]", id));
-  //     formData.subcategories.forEach(id => formDataToSubmit.append("subcategories[]", id));
-
-  //     // Specifications
-  //     if (formData.specifications?.length > 0) {
-  //       formDataToSubmit.append("specifications", JSON.stringify(formData.specifications));
-  //     }
-
-  //     // Fournisseur
-  //     if (formData.fournisseur) {
-  //       formDataToSubmit.append("fournisseur", formData.fournisseur);
-  //     }
-
-  //     // Images
-  //     imageFiles.forEach(file => formDataToSubmit.append("images", file));
-  //     if (isEditMode) {
-  //       formData.images.forEach(img => formDataToSubmit.append("existingImages[]", img));
-  //       if (product?._id) {
-  //         formDataToSubmit.append("productId", product._id); // Use "productId" as expected by backend
-  //       } else {
-  //         throw new Error("Product ID is missing");
-  //       }
-  //     }
-
-  //     // Debugging
-  //     console.log("--- FormData Contents ---", formDataToSubmit);
-
-
-  //     // API Call
-  //     const response = isEditMode
-  //       ? await modifierProduit(product._id, formDataToSubmit)
-  //       : await addProduit(formDataToSubmit);
-
-  //     // Update state
-  //     setProducts(prev => isEditMode
-  //       ? prev.map(p => p._id === product._id ? response.produit : p)
-  //       : [...prev, response.data.produit]
-  //     );
-  //     CustomToast("success", `Produit ${isEditMode ? "modifié" : "ajouté"} avec succès`);
-  //     setOpen(false);
-  //   } catch (error) {
-  //     console.error("Erreur:", error);
-  //     const errorMessage = error.response?.data?.message || error.message;
-  //     toast.error(errorMessage.includes("\n")
-  //       ? "Plusieurs erreurs:\n" + errorMessage
-  //       : errorMessage
-  //     );
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -602,8 +504,8 @@ export default function ProductModal({ product, mode = "add", use = "max" }) {
       <DialogTrigger asChild>
         {isEditMode ? (
           <Button
-            variant={use === "min" ? "ghost" : ""}
-            className={`cursor-pointer ${use === "max" && "w-full text-white"} hover:bg-black/70`}
+            variant={use === "min" ? "ghost" : "outline"}
+            className={`cursor-pointer ${use === "max" && "w-full text-white"} text-accent-foreground`}
           >
             {use === "max" ? (
               <>
@@ -619,7 +521,8 @@ export default function ProductModal({ product, mode = "add", use = "max" }) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="min-w-[800px] max-h-[90vh] overflow-y-auto bg-gradient-to-br from-white to-gray-50">
+      
+      <DialogContent className="min-w-[800px] max-h-[90vh] overflow-y-auto bg-gradient-to-br from-white to-gray-50"   onCloseAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold bg-clip-text text-primary">
             {isEditMode ? "Modifier le produit" : "Ajouter un produit"}

@@ -44,7 +44,9 @@ const LoginPage = () => {
   }
   return (
     <div className='w-full flex h-screen'>
-      <div className='hidden w-1/2 h-full bg-muted md:block'></div>
+      <div className='hidden w-1/2 h-full bg-muted md:block'>
+        <img src="/login.jpg" className='w-full h-full object-cover' alt="login" />
+      </div>
       <div className='w-full md:w-1/2 h-full flex items-center justify-center'>
         <Card className="w-[50%]">
           <CardHeader>

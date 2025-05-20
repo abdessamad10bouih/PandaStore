@@ -14,6 +14,9 @@ import FAQ from '../components/Help/FAQ';
 import HomePage from '../pages/Store/HomePage';
 import SignUp from '../components/auth/Signup';
 import Posts from '../pages/Posts';
+import ForgotPassword from '../components/auth/ForgotPassword';
+import OTP from '../components/auth/OTP';
+import ChangePass from '../components/auth/ChangePass';
 
 const AppRoutes = () => {
     return (
@@ -22,16 +25,21 @@ const AppRoutes = () => {
                 <Route path='/' element={<HomePage />} />
                 <Route path='/login' element={<LoginForm />} />
                 <Route path='/signup' element={<SignUp />} />
+                <Route path='/reset-password' element={<ForgotPassword />} />
+                <Route path='/verifierOTP' element={<OTP />} />
+                <Route path='/changer-password' element={<ChangePass />} />
                 <Route element={<ProtectedRoutes />}>
-                    <Route path='/Dashboard' element={<Dashboard />} />
-                    <Route path='/products' element={<ProductDashboard />} />
-                    <Route path='/products/:id' element={<OneProduct />} />
-                    <Route path='/fournisseurs' element={<FournisseurPage />} />
-                    <Route path='/categories' element={<Categories />} />
-                    <Route path='/parametres' element={<ParametrePage />} />
-                    <Route path='/posts' element={<Posts />} />
-                    <Route path='/aide' element={<AidePage />} />
-                    <Route path='/aide/FAQ' element={<FAQ />} />
+                    <Route path='/dashboard' element={<Dashboard />} />
+                    <Route path='/dashboard/products' element={<ProductDashboard />} />
+                    <Route path='/dashboard/products/:id' element={<OneProduct />} />
+                    <Route path='/dashboard/fournisseurs' element={<FournisseurPage />} />
+                    <Route path='/dashboard/categories' element={<Categories />} />
+                    <Route path='/dashboard/parametres' element={<ParametrePage />} />
+                    <Route path='/dashboard/posts' element={<Posts />} />
+                    <Route path='/dashboard/aide'>
+                        <Route index element={<AidePage />} />
+                        <Route path='FAQ' element={<FAQ />} />
+                    </Route>
                 </Route>
             </Routes>
         </BrowserRouter>

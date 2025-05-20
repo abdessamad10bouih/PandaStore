@@ -1,4 +1,4 @@
-"use client"
+
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Bell, Search } from "lucide-react"
 import { Input } from "./ui/input"

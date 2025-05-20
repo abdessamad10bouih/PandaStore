@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import { Heart, MenuIcon, Search, ShoppingCart, X } from "lucide-react"
@@ -70,7 +70,6 @@ const HomeNavbar = () => {
           </div>
         </div>
 
-        {/* Middle section: Search bar (desktop only) */}
         <div className="w-[40%] h-full items-center justify-center hidden md:flex">
           <div className="w-full h-[80%] relative group">
             <div className="w-full h-full flex pl-3 rounded-lg border border-input bg-background hover:border-primary/50 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/30 transition-all duration-200">
@@ -86,7 +85,6 @@ const HomeNavbar = () => {
           </div>
         </div>
 
-        {/* Right section: Action icons and user menu */}
         <div className="flex items-center justify-end gap-1 sm:gap-3 md:gap-5">
           <Button variant="ghost" size="icon" className="relative md:hidden" onClick={() => setShowSearch(!showSearch)}>
             {showSearch ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
@@ -124,7 +122,6 @@ const HomeNavbar = () => {
         </div>
       </nav>
 
-      {/* Mobile search bar */}
       <AnimatePresence>
         {showSearch && (
           <motion.div

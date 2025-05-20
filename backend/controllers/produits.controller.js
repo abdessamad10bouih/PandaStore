@@ -2,7 +2,7 @@ import Produit from "../models/produit.model.js";
 import Categorie from "../models/categorie.model.js";
 import Fournisseur from "../models/fournisseur.model.js";
 import mongoose from "mongoose";
-import cloudinary, { uploadImageToCloudinary } from "../lib/cloudinary.js";
+import cloudinary, { uploadImageToCloudinary, deleteImageFromCloudinary } from "../lib/cloudinary.js";
 import upload from "../lib/multerConfig.js";
 
 // Helper function to upload a file to Cloudinary
@@ -19,7 +19,6 @@ const uploadToCloudinary = (file) => {
     });
 };
 
-// Helper to normalize category input (string or array)
 const processCategories = (input) => {
     if (!input) return [];
     if (Array.isArray(input)) return input;
@@ -29,7 +28,7 @@ const processCategories = (input) => {
 
 export const getAllProduits = async (req, res) => {
     try {
-        const produits = await Produit.find().populate("categories").sort({ createdAt: -1 });
+        const produits = await Produit.find().populate("categories subCategories").sort({ createdAt: -1 });
         res.status(200).json(produits);
     } catch (error) {
         console.error("Erreur lors de la récupération des produits :", error);
@@ -67,7 +66,6 @@ export const AjouterProduit = async (req, res) => {
             discount,
             fournisseur,
         } = req.body;
-
         if (!nom || !description || !prix || !stock) {
             return res.status(400).json({ message: "Tous les champs sont requis" });
         }
@@ -92,7 +90,7 @@ export const AjouterProduit = async (req, res) => {
             stock: parsedStock,
             categories: processCategories(categories),
             specifications: specs,
-            subcategories: processCategories(req.body.subcategories),
+            subCategories: processCategories(req.body.subcategories),
             status: status || "active",
             sku,
             images: imageUrls,
@@ -107,6 +105,13 @@ export const AjouterProduit = async (req, res) => {
             { $addToSet: { produits: newProduct._id } }
         );
 
+        if (Array.isArray(req.body.subcategories)) {
+            await Categorie.updateMany(
+                { _id: { $in: req.body.subcategories } },
+                { $addToSet: { produits: newProduct._id } }
+            );
+        }
+
 
         if (mongoose.Types.ObjectId.isValid(fournisseur)) {
             await Fournisseur.updateMany(
@@ -114,10 +119,11 @@ export const AjouterProduit = async (req, res) => {
                 { $addToSet: { produits: newProduct._id } }
             );
         }
-
+        // console.log("Image URL's : ", imageUrls);
+        const populatedProduct = await newProduct.populate('categories fournisseur subCategories');
         res.status(201).json({
             message: "Produit ajouté avec succès",
-            produit: newProduct,
+            produit: populatedProduct,
         });
     } catch (error) {
         console.error("Erreur lors de l'ajout du produit :", error);
@@ -132,31 +138,23 @@ export const ModifierProduit = async (req, res) => {
     try {
         const { productId } = req.params;
         if (!productId) return res.status(400).json({ message: "ID du produit est requis" });
-
+        // console.log("body : ", req.body, "files : ", req.files);
         const {
             nom,
             description,
             prix,
             stock,
             categories = [],
-            subcategories = [],
             specifications: specsJson = '[]',
             status = 'active',
             sku,
             cost = 0,
             discount = 0,
+            subcategories = [],
             fournisseur,
             existingImages = [],
         } = req.body;
 
-        let parsedSpecs = specifications;
-        if (typeof specifications === "string") {
-            try {
-                parsedSpecs = JSON.parse(specifications);
-            } catch (err) {
-                return res.status(400).json({ message: "Format des spécifications invalide" });
-            }
-        }
 
         // Clean and validate input
         const parsedPrix = Number(prix);
@@ -169,6 +167,14 @@ export const ModifierProduit = async (req, res) => {
 
         let specifications = [];
 
+        let parsedSpecs = specifications;
+        if (typeof specifications === "string") {
+            try {
+                parsedSpecs = JSON.parse(specifications);
+            } catch (err) {
+                return res.status(400).json({ message: "Format des spécifications invalide" });
+            }
+        }
         if (Array.isArray(specsJson)) {
             specifications = specsJson.map((spec) =>
                 typeof spec === "string" ? JSON.parse(spec) : spec
@@ -181,27 +187,39 @@ export const ModifierProduit = async (req, res) => {
                 specifications = [];
             }
         }
-
-
-
         const existingProduct = await Produit.findById(productId);
         if (!existingProduct)
             return res.status(404).json({ message: "Produit non trouvé" });
+
+        await updateSubcategoryReferences(
+            productId,
+            existingProduct.subCategories || [],
+            processCategories(req.body.subcategories)
+        );
+
+
+
 
         // Process images and specs
         const imageUrls = await processProductImages(req, existingImages);
         const specs = processSpecifications(specifications);
 
-        // Remove fournisseur if it's an empty string
+        const cleanObjectIds = (ids) =>
+            (Array.isArray(ids) ? ids : [ids])
+                .filter(id => mongoose.Types.ObjectId.isValid(id));
+
+        const cleanedCategories = cleanObjectIds(categories);
+
         const updatedFields = {
             nom,
             description,
             prix: parsedPrix,
             images: imageUrls,
-            categories,
-            subcategories,
+            categories: cleanedCategories,
             stock: parsedStock,
             specifications: specs,
+            subCategories: processCategories(req.body.subcategories),
+            fournisseur: mongoose.Types.ObjectId.isValid(fournisseur) ? fournisseur : null,
             status,
             sku,
             cost: parsedCost,
@@ -217,14 +235,12 @@ export const ModifierProduit = async (req, res) => {
         await updateCategoryReferences(
             productId,
             existingProduct.categories || [],
-            existingProduct.subcategories || [],
             categories,
-            subcategories
         );
-
+        const populatedProduct = await updatedProduct.populate('categories fournisseur subCategories');
         res.status(200).json({
             message: "Produit mis à jour avec succès",
-            produit: updatedProduct,
+            produit: populatedProduct,
         });
 
     } catch (error) {
@@ -248,16 +264,13 @@ async function processProductImages(req, existingImages) {
         });
     }
 
-    if (req.files?.images) {
-        const files = Array.isArray(req.files.images)
-            ? req.files.images
-            : [req.files.images];
-
-        for (const file of files) {
+    if (req.files && req.files.length > 0) {
+        for (const file of req.files) {
             const result = await uploadImageToCloudinary(file);
             imageUrls.push(result.secure_url);
         }
     }
+
 
     return imageUrls;
 }
@@ -286,18 +299,12 @@ async function updateProductDocument(id, updateData) {
 }
 
 // Helper function to update category references
-async function updateCategoryReferences(productId, oldCategories, oldSubcategories, newCategories, newSubcategories) {
-    // Categories to remove
+// Helper function to update category references
+async function updateCategoryReferences(productId, oldCategories, newCategories) {
     const categoriesToRemove = oldCategories.filter(
         catId => !newCategories.includes(catId.toString())
     );
 
-    // Subcategories to remove
-    const subcategoriesToRemove = oldSubcategories.filter(
-        subId => !newSubcategories.includes(subId.toString())
-    );
-
-    // Remove from old categories
     if (categoriesToRemove.length > 0) {
         await Categorie.updateMany(
             { _id: { $in: categoriesToRemove } },
@@ -305,30 +312,14 @@ async function updateCategoryReferences(productId, oldCategories, oldSubcategori
         );
     }
 
-    // Remove from old subcategories
-    if (subcategoriesToRemove.length > 0) {
-        await Categorie.updateMany(
-            { _id: { $in: subcategoriesToRemove } },
-            { $pull: { produits: productId } }
-        );
-    }
-
-    // Add to new categories
     if (newCategories.length > 0) {
         await Categorie.updateMany(
             { _id: { $in: newCategories } },
             { $addToSet: { produits: productId } }
         );
     }
-
-    // Add to new subcategories
-    if (newSubcategories.length > 0) {
-        await Categorie.updateMany(
-            { _id: { $in: newSubcategories } },
-            { $addToSet: { produits: productId } }
-        );
-    }
 }
+
 
 export const getProducts = async (req, res) => {
     try {
@@ -414,13 +405,20 @@ export const SupprimerProduit = async (req, res) => {
                     { session }
                 );
             }
+
+            // Delete images from Cloudinary
             if (produit.images && produit.images.length > 0) {
-                const publicIds = produit.images.map(url => {
-                    const parts = url.split('/');
-                    return parts[parts.length - 1].split('.')[0];
-                });
-                await cloudinary.api.delete_resources(publicIds);
+                for (const imageUrl of produit.images) {
+                    const publicId = imageUrl.split('/').pop().split('.')[0]; // Extract public ID
+                    try {
+                        await deleteImageFromCloudinary(publicId);
+                    } catch (error) {
+                        console.error(`Error deleting image ${publicId} from Cloudinary:`, error);
+                    }
+                }
             }
+
+            // Delete the product
             await Produit.findByIdAndDelete(productId, { session });
 
             await session.commitTransaction();
@@ -454,3 +452,24 @@ export const RechercherProduit = async (req, res) => {
         res.status(500).json({ message: "Erreur serveur" });
     }
 };
+
+
+async function updateSubcategoryReferences(productId, oldSubs = [], newSubs = []) {
+    const toRemove = oldSubs.filter(
+        subId => !newSubs.includes(subId.toString())
+    );
+
+    if (toRemove.length > 0) {
+        await Categorie.updateMany(
+            { _id: { $in: toRemove } },
+            { $pull: { produits: productId } }
+        );
+    }
+
+    if (newSubs.length > 0) {
+        await Categorie.updateMany(
+            { _id: { $in: newSubs } },
+            { $addToSet: { produits: productId } }
+        );
+    }
+}

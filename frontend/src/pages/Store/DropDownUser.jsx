@@ -26,7 +26,7 @@ const DropDownUser = () => {
         }
     }
     return (
-        <DropdownMenu>
+        <DropdownMenu modal={false} >
             <DropdownMenuTrigger asChild>
                 <Avatar>
                     <AvatarImage src="" alt="User" />
@@ -35,7 +35,7 @@ const DropDownUser = () => {
                     </AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
+            <DropdownMenuContent className="w-56" onCloseAutoFocus={(e) => e.preventDefault()}>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className='flex items-center gap-2'>

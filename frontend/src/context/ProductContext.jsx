@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getAllUsers, getCategories, getFournisseurs, getProduits } from "../lib/api";
+import { getAllUsers, getCategories, getFournisseurs, getPosts, getProduits } from "../lib/api";
 import LoadingScreen from "../components/LoadingScreen";
 
 export const ProductContext = createContext();
@@ -8,7 +8,8 @@ export const ProductProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
     const [users, setUsers] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [fournisseurs, setFournisseurs] = useState([])
+    const [fournisseurs, setFournisseurs] = useState([]);
+    const [posts, setPosts] = useState([]);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [loader, setLoader] = useState(false);
@@ -38,6 +39,23 @@ export const ProductProvider = ({ children }) => {
                 setIsLoading(true);
                 const res = await getCategories();
                 setCategories(res.data);
+                setLoader(false);
+            } catch (error) {
+                console.error("Error while fetching products: ", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    useEffect(() => {
+        setLoader(true);
+        const fetchCategories = async () => {
+            try {
+                setIsLoading(true);
+                const res = await getPosts();
+                setPosts(res.data.posts);
                 setLoader(false);
             } catch (error) {
                 console.error("Error while fetching products: ", error);
@@ -89,7 +107,7 @@ export const ProductProvider = ({ children }) => {
     }
 
     return (
-        <ProductContext.Provider value={{ products, setProducts, isLoading, error, categories, setCategories, fournisseurs, setFournisseurs, users, setUsers }}>
+        <ProductContext.Provider value={{ products, setProducts, isLoading, error, categories, setCategories, fournisseurs, setFournisseurs, users, setUsers, posts, setPosts }}>
             {children}
         </ProductContext.Provider>
     );
