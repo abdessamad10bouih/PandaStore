@@ -1,4 +1,4 @@
-# 🐼 PandaStore: A Versatile E-commerce Solution
+# 🐼 PandaStore
 
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white)
@@ -245,27 +245,17 @@ We welcome contributions to PandaStore! Please follow these guidelines:
 When reporting bugs or suggesting features:
 1. Check if the issue already exists
 2. Provide detailed reproduction steps
-3. Include any relevant error messages or screenshots
 
-## 📄 License and Credits
+## 📑 License and Credits
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### Third-Party Tools and Libraries
-- **shadcn/ui**: Component library
-- **Tailwind CSS**: CSS framework
-- **Cloudinary**: Image storage and management
-- **Recharts**: Data visualization
-- **React**: Frontend library
-- **Node.js**: Backend runtime
-- **MongoDB**: Database
+PandaStore was developed by undefined. Special thanks to the open-source community for the excellent tools and libraries that made this project possible.
 
-## 👥 Maintainers and Contacts
+## 📞 Maintainers and Contacts
 
-Project maintained by undefined. For questions and support:
+The project is maintained by abdessamad10bouih.
 
-- **GitHub**: https://github.com/abdessamad10bouih/PandaStore
-- **Email**: [Please add contact email]
-- **Documentation**: [Please add documentation link, if available]
-
-We welcome feedback, bug reports, and contributions from the developer community!
+For questions, collaborations, or reporting issues, please:
+- Submit an issue on GitHub
+- Contact the maintainers through GitHub messaging
