@@ -245,25 +245,27 @@ We welcome contributions to PandaStore! Please follow these guidelines:
 When reporting bugs or suggesting features:
 1. Check if the issue already exists
 2. Provide detailed reproduction steps
-3. Include screenshots or error messages when relevant
-4. Specify your environment (OS, browser, etc.)
+3. Include any relevant error messages or screenshots
 
-## 📜 License and Credits
+## 📄 License and Credits
 
-This project is currently not licensed. Please contact the maintainers for any usage questions.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The application was developed with the following open-source packages:
-- [React](https://reactjs.org/)
-- [Express.js](https://expressjs.com/)
-- [MongoDB](https://www.mongodb.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
+### Third-Party Tools and Libraries
+- **shadcn/ui**: Component library
+- **Tailwind CSS**: CSS framework
+- **Cloudinary**: Image storage and management
+- **Recharts**: Data visualization
+- **React**: Frontend library
+- **Node.js**: Backend runtime
+- **MongoDB**: Database
 
 ## 👥 Maintainers and Contacts
 
-The PandaStore project is maintained by:
-- **Abdessamad Bouih** - Project Owner
+Project maintained by undefined. For questions and support:
 
-You can reach the maintainers through the GitHub repository or by email if provided. We welcome feedback, bug reports, and feature requests through the GitHub issue tracker.
+- **GitHub**: https://github.com/abdessamad10bouih/PandaStore
+- **Email**: [Please add contact email]
+- **Documentation**: [Please add documentation link, if available]
 
-For any inquiries about the project, please open an issue in the GitHub repository.
+We welcome feedback, bug reports, and contributions from the developer community!
