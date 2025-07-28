@@ -250,12 +250,20 @@ When reporting bugs or suggesting features:
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-PandaStore was developed by undefined. Special thanks to the open-source community for the excellent tools and libraries that made this project possible.
+**Credits**
+- Built with React and Node.js
+- UI components powered by shadcn/ui
+- Data visualization with Recharts
+- Responsive design with Tailwind CSS
+- Authentication using JWT tokens
 
-## 📞 Maintainers and Contacts
+## 📬 Maintainers and Contacts
 
-The project is maintained by abdessamad10bouih.
+**Primary Maintainer**
+- **Abdessamad Bouih** - [GitHub Profile](https://github.com/abdessamad10bouih)
 
-For questions, collaborations, or reporting issues, please:
-- Submit an issue on GitHub
-- Contact the maintainers through GitHub messaging
+For support and inquiries, please contact: pandastore.support@example.com
+
+---
+
+*Built with ❤️ by the PandaStore team*
